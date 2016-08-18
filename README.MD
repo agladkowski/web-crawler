@@ -5,7 +5,7 @@ Crawling is limited to a single domain.
 
 
 #### Requirements
-Git
+Git, 
 Java 8
 
 #### How to get the code
