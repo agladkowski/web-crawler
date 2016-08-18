@@ -40,3 +40,13 @@ java -jar build/libs/web-crawler-1.0-all.jar www.bbc.co.uk 1
 java -jar build/libs/web-crawler-1.0-all.jar www.bbc.co.uk 1 bbc-sitemap.txt
 ```
 
+#### Credits
+- Jsoup - Java HTML Parser (https://jsoup.org/)
+- Jadler - Java HTTP mocking library (https://github.com/jadler-mocking/jadler/wiki)
+
+#### License
+This project is licensed under http://www.apache.org/licenses/LICENSE-2.0
+
+Author bears no responsibility on the way this project is used.
+
+

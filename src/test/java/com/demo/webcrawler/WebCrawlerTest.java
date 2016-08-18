@@ -11,6 +11,12 @@ import static org.junit.Assert.assertEquals;
 
 /**
  * Created by andrzej on 2016-08-18.
+ *
+ * Notes:
+ * - Tests use Jadler http mocking library (https://github.com/jadler-mocking/jadler/wiki).
+ * - I am a fan of testing API and not implementation details, if I decide to re-write crawler implementation, none of my tests should change.
+ * - Another valid approach, perhaps simpler, would be to provide crawler with abstraction (HttpContentProvider.get(url) -> String) and mock that.
+ *      Normally I would go for that choice to mock external application dependencies (Mock boundaries).
  */
 public class WebCrawlerTest {
     private Crawler crawler;
