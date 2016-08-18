@@ -24,7 +24,7 @@ Unix
 
 Windows
 ```
-gradlew.bat shadowJar
+gradlew.bat clean test shadowJar
 ```
 
 #### How to run
