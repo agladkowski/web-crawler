@@ -5,7 +5,14 @@ Crawling is limited to a single domain.
 
 
 #### Requirements
+Git
 Java 8
+
+#### How to get the code
+
+```
+git clone https://github.com/agladkowski/web-crawler.git web-crawler
+```
 
 #### How to build
 Cd to the root of the project, and then execute this command
