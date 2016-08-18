@@ -18,18 +18,13 @@ import java.util.stream.Collectors;
  * Created by andrzej on 2016-08-18.
  */
 public class WebCrawler implements Crawler {
-    private static final int DEFAULT_TIMEOUT_IN_MILLIS = 1000;
-    private static final int DEFAULT_MAX_PAGE_TREE_DEPTH = 10;
+    private static final int DEFAULT_MAX_PAGE_TREE_DEPTH = 1;
     private static final String USER_AGENT = "web-crawler_1.0";
     private static final String NEW_LINE = "\n";
 
     private final Logger logger = LoggerFactory.getLogger(WebCrawler.class);
     private final int pageTimeoutInMillis;
     private final int maxSearchDepth;
-
-    public WebCrawler() {
-        this(DEFAULT_TIMEOUT_IN_MILLIS, DEFAULT_MAX_PAGE_TREE_DEPTH);
-    }
 
     public WebCrawler(int pageTimeoutInMillis) {
         this.pageTimeoutInMillis = pageTimeoutInMillis;

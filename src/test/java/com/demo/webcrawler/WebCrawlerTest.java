@@ -18,7 +18,7 @@ public class WebCrawlerTest {
     @Before
     public void setUp() {
         initJadler();
-        crawler = new WebCrawler();
+        crawler = new WebCrawler(1000, 5);
     }
 
     @After
