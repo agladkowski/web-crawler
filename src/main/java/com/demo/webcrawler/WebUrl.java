@@ -20,6 +20,11 @@ public class WebUrl {
         return crawlable;
     }
 
+    @Override
+    public String toString() {
+        return "WebUrl(" + url + (crawlable ? " - crawlable" : "") + ")";
+    }
+
     // factory methods
 
     public static WebUrl notCrawlable(String url) {

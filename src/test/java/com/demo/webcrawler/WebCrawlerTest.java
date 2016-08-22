@@ -101,6 +101,30 @@ public class WebCrawlerTest {
     }
 
     @Test
+    public void testPageRedirect() {
+        testPageRedirect(301);
+        testPageRedirect(302);
+    }
+
+    private void testPageRedirect(int redirectStatusCode) {
+        //prepare
+        resetJadler();
+        String baseUrl = mockUrl("/child1");
+        onRequest().havingPathEqualTo("/child1").respond().withStatus(redirectStatusCode).withHeader("Location", mockUrl("/child2"));
+        onRequest().havingPathEqualTo("/child2").respond().withBody("<html><a href=\"/child3\">Child 3</a></html>");
+        onRequest().havingPathEqualTo("/child3").respond().withBody("");
+
+        // act
+        String siteMap = crawler.createSiteMap(baseUrl);
+
+        // assert
+        assertEquals(
+                    baseUrl + "\n" +
+                    mockUrl("/child3") + "\n"
+                    , siteMap);
+    }
+
+    @Test
     public void testLinkWithoutHrefAttribute() {
         //prepare
         String baseUrl = mockUrl("/parent/");
@@ -132,6 +156,43 @@ public class WebCrawlerTest {
         assertEquals(
                 baseUrl + "\n" +
                 mockUrl("/child1") + "\n"
+                , siteMap);
+    }
+
+    @Test
+    public void testLinkStartingWithHash() {
+        //prepare
+        String baseUrl = mockUrl("/");
+        onRequest().havingPathEqualTo("/").respond().withBody(
+                "<html><a href=\"#child1\">Child 1</a></html>");
+
+        // act
+        String siteMap = crawler.createSiteMap(baseUrl);
+
+        // assert
+        assertEquals(
+                baseUrl + "\n"
+                , siteMap);
+    }
+
+    @Test
+    public void testChildNotDirectlyUnderParentUrl() {
+        //prepare
+        crawler = new WebCrawler(1000, 3);
+        String baseUrl = mockUrl("/blog");
+        onRequest().havingPathEqualTo("/blog").respond().withBody(
+                "<html><a href=\"" + mockUrl("/2016/01") + "\">2016/01</a></html>");
+        onRequest().havingPathEqualTo("/2016/01").respond().withBody(
+                "<html><a href=\"" + mockUrl("/2016/01/01") + "\">2016/01/01</a></html>");
+        onRequest().havingPathEqualTo("/2016/01/01").respond().withBody("");
+        // act
+        String siteMap = crawler.createSiteMap(baseUrl);
+
+        // assert
+        assertEquals(
+                baseUrl + "\n" +
+                mockUrl("/2016/01") + "\n" +
+                mockUrl("/2016/01/01") + "\n"
                 , siteMap);
     }
 
@@ -175,8 +236,8 @@ public class WebCrawlerTest {
         String baseUrl = mockUrl("/parent/");
         onRequest().havingPathEqualTo("/parent/").respond().withBody(
                         "<html>" +
-                            "<a href=\"/child1\">Child 1 relative to root domain</a>" +
                             "<a href=\"child2\">Child 2 relative to current page url</a>" +
+                            "<a href=\"/child1\">Child 1 relative to root domain</a>" +
                             "<a href=\"" + mockUrl("/parent/child3") + "\">Child 3 fully formed url</a>" +
                         "</html>");
 
@@ -215,8 +276,8 @@ public class WebCrawlerTest {
         assertEquals(
                 baseUrl + "\n" +
                 mockUrl("/child1") + "\n" +
-                "www.twitter.com" + "\n" +
-                "http://google.com\n"
+                "http://google.com\n" +
+                "www.twitter.com" + "\n"
                 , siteMap);
     }
 

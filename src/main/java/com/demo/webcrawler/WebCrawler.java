@@ -91,7 +91,7 @@ public class WebCrawler implements Crawler {
                 return;// stopping, reached max search depth
             }
 
-            logger.info(pageUrl);
+            logger.info("[" + currentSearchDepth + "] " + pageUrl);
 
             alreadyVisitedUrls.add(pageUrl);
 
@@ -150,34 +150,34 @@ public class WebCrawler implements Crawler {
     private List<WebUrl> extractLinks(String pageUrl, Document pageContent, String elementSelector, String attributeSelector) {
         return pageContent.select(elementSelector).stream()
             .map(linkElement -> linkElement.attr(attributeSelector))
-            .filter(childUrl -> childUrl != null && !childUrl.isEmpty())
+            .filter(childUrl -> childUrl != null && !childUrl.isEmpty())// not null or empty
+            .filter(childUrl -> !childUrl.startsWith("#") && !childUrl.startsWith("/#"))// starts with #
             .map(childUrl -> createChildPageUrl(pageUrl, childUrl))
+            .sorted((url1, url2) -> url1.getUrl().compareTo(url2.getUrl()))
             .collect(Collectors.toList());
     }
 
     private WebUrl createChildPageUrl(String pageUrl, String childUrl) {
-        if (childUrl.startsWith(pageUrl)) {
-            return WebUrl.crawlable(childUrl);
+        try {
+            String baseUrl = getBaseUrl(pageUrl);
 
-        } else if (childUrl.matches("http[s]?.*|www\\..*")) {
-            // external link like google/facebook
-            return WebUrl.notCrawlable(childUrl);
+            if (childUrl.startsWith(baseUrl)) {
+                return WebUrl.crawlable(childUrl);
 
-        } else if (childUrl.startsWith("//")) {
-            // link without protocol e.g. //page.com/some/url
-            try {
+            } else if (childUrl.matches("http[s]?.*|www\\..*")) {
+                // external link like google/facebook
+                return WebUrl.notCrawlable(childUrl);
+
+            } else if (childUrl.startsWith("//")) {
+                // link without protocol e.g. //page.com/some/url
                 return WebUrl.crawlable(getProtocol(pageUrl) + childUrl);
-            } catch (MalformedURLException e) {
-                return WebUrl.notCrawlable(pageUrl + " - malformed url");
-            }
 
-        } else if (childUrl.startsWith("/")) {
-            // child page relative to the root of the domain, e.g. /parent/child -> http://some.domain/parent/child
-            try {
-                return WebUrl.crawlable(getBaseUrl(pageUrl) + childUrl);
-            } catch (MalformedURLException e) {
-                return WebUrl.notCrawlable(pageUrl + " - malformed url");
+            } else if (childUrl.startsWith("/")) {
+                // child page relative to the root of the domain, e.g. /parent/child -> http://some.domain/parent/child
+                return WebUrl.crawlable(baseUrl + childUrl);
             }
+        } catch (MalformedURLException e) {
+            return WebUrl.notCrawlable(pageUrl + " - malformed url");
         }
 
         // child page relative to parent page, e.g. child2 -> http://some.domain/child1/child2
